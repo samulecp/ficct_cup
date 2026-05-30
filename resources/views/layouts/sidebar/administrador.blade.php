@@ -1,6 +1,6 @@
-<a href="{{ route('admin.dashboard') }}"
+<a href="{{ route('dashboard') }}"
    class="flex items-center p-2 rounded hover:bg-gray-700
-   {{ request()->routeIs('admin.dashboard') ? 'bg-gray-700' : '' }}">
+   {{ request()->routeIs('dashboard') ? 'bg-gray-700' : '' }}">
 
     <span class="text-lg">🏠</span>
 

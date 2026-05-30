@@ -13,11 +13,17 @@ use App\Http\Controllers\PostulanteController;
 use App\Http\Controllers\PreInscripcionController;
 use App\Http\Controllers\ProfileController;
 
+
+
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('auth.login');
+    return redirect()->route('login');
 });
+//dashboard para todos
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware('auth')->name('dashboard');
 
 //operador-admin
 Route::middleware(['auth', 'role:administrador|operador'])
@@ -40,8 +46,7 @@ Route::middleware(['auth', 'role:operador'])
     ->prefix('operador')
     ->name('operador.')
     ->group(function () {
-        Route::get('/dashboard', [OperadorController::class, 'index'])
-            ->name('dashboard');
+        
 
         
     });
@@ -51,8 +56,7 @@ Route::middleware(['auth', 'role:docente'])
     ->prefix('docente')
     ->name('docente.')
     ->group(function () {
-        Route::get('/dashboard', [DocenteController::class, 'index'])
-            ->name('dashboard');
+        
     });
 
 // POSTULANTE
@@ -60,8 +64,7 @@ Route::middleware(['auth', 'role:postulante'])
     ->prefix('postulante')
     ->name('postulante.')
     ->group(function () {
-        Route::get('/dashboard', [PostulanteController::class, 'index'])
-            ->name('dashboard');
+        
     });
 
 //admin
@@ -70,14 +73,16 @@ Route::middleware(['auth', 'role:administrador'])
     ->name('admin.')
     ->group(function () {
 
-        Route::get('/dashboard', [AdministradorController::class, 'index'])
-            ->name('dashboard');
+        
 
         Route::resource('carreras', CarreraController::class);
 
        // Route::resource('usuarios', UsuarioController::class);
 
-        Route::resource('operadores', OperadorController::class);
+        Route::resource('operadores', OperadorController::class)
+    ->parameters([
+        'operadores' => 'operador'
+    ]);
 
         Route::resource('administradores', AdministradorController::class);
 

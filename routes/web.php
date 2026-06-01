@@ -18,7 +18,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect()->route('login');
+    return 'Laravel OK';
 });
 //dashboard para todos
 Route::get('/dashboard', function () {

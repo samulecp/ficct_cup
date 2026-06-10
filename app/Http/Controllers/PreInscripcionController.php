@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Calificacion;
 use App\Models\User;
 use App\Models\Carrera;
+use App\Models\Materia;
 use App\Models\Periodo;
 use App\Models\Postulante;
 use App\Models\PreInscripcion;
@@ -12,22 +14,36 @@ use Illuminate\Http\Request;
 
 class PreInscripcionController extends Controller
 {
-    public function index()
-    {
-        $preinscripciones = PreInscripcion::with([
-            'postulante',
-            'periodo',
-            'carreraPrimera',
-            'carreraSegunda'
-        ])
-        ->latest()
-        ->get();
+   public function index(Request $request)
+{
+    $buscar = $request->buscar;
 
-        return view(
-            'preinscripciones.index',
-            compact('preinscripciones')
-        );
-    }
+    $preinscripciones = PreInscripcion::with([
+        'postulante',
+        'carreraPrimera',
+        'carreraSegunda',
+        'periodo',
+        'grupo'
+    ])
+
+    ->when($buscar, function ($query) use ($buscar) {
+
+        $query->whereHas('postulante', function ($q) use ($buscar) {
+
+            $q->where('nombre', 'ILIKE', "%{$buscar}%")
+              ->orWhere('ci', 'ILIKE', "%{$buscar}%");
+
+        });
+
+    })
+
+    ->get();
+
+    return view(
+        'preinscripciones.index',
+        compact('preinscripciones')
+    );
+}
 
     public function create()
     {
@@ -215,6 +231,8 @@ class PreInscripcionController extends Controller
             'Preinscripción registrada para CI: '
             . $postulante->ci
         );
+
+       
 
         return redirect()
             ->route(

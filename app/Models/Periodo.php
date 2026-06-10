@@ -19,4 +19,9 @@ class Periodo extends Model
 {
     return $this->hasMany(PreInscripcion::class);
 }
+
+public function grupos()
+{
+    return $this->hasMany(Grupo::class);
+}
 }

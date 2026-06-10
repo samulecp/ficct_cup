@@ -1,71 +1,57 @@
-<x-guest-layout>
-    <div class="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-            <!-- Título -->
-            <div class="text-center mb-6">
-                <h1 class="text-2xl font-bold text-gray-800">
-                    Bienvenido
-                </h1>
-                <p class="text-sm text-gray-500">
-                    Inicia sesión en tu sistema
-                </p>
-            </div>
+<body class="bg-gradient-to-r from-blue-600 to-indigo-700 flex items-center justify-center min-h-screen">
 
-            <!-- Session Status -->
-            <x-auth-session-status class="mb-4" :status="session('status')" />
+<div class="bg-white w-full max-w-md rounded-xl shadow-lg p-8">
 
-            <form method="POST" action="{{ route('login') }}" class="space-y-5">
-                @csrf
+    <h1 class="text-2xl font-bold text-center mb-6">
+        Iniciar Sesión
+    </h1>
 
-                <!-- Email -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">
-                        Correo
-                    </label>
-                    <input type="email"
-                           name="email"
-                           value="{{ old('email') }}"
-                           required
-                           autofocus
-                           class="mt-1 w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-                    @error('email')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Password -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">
-                        Contraseña
-                    </label>
-                    <input type="password"
-                           name="password"
-                           required
-                           class="mt-1 w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-                    @error('password')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Remember -->
-                <div class="flex items-center">
-                    <input type="checkbox"
-                           name="remember"
-                           class="rounded border-gray-300 text-indigo-600">
-                    <label class="ml-2 text-sm text-gray-600">
-                        Recordarme
-                    </label>
-                </div>
-
-                <!-- Botón -->
-                <button type="submit"
-                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition">
-                    Ingresar
-                </button>
-
-            </form>
+    {{-- ERRORES --}}
+    @if ($errors->any())
+        <div class="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">
+            {{ $errors->first() }}
         </div>
-    </div>
-</x-guest-layout>
+    @endif
+
+    <form method="POST" action="{{ route('login') }}" class="space-y-4">
+
+        @csrf
+
+        <div>
+            <label class="text-sm text-gray-600">Correo</label>
+            <input type="email" name="email"
+                   class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   required>
+        </div>
+
+        <div>
+            <label class="text-sm text-gray-600">Contraseña</label>
+            <input type="password" name="password"
+                   class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   required>
+        </div>
+
+        <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
+            Entrar
+        </button>
+
+    </form>
+
+    <p class="text-center text-sm text-gray-500 mt-4">
+        Sistema de Admisión Universitaria
+    </p>
+
+</div>
+
+</body>
+</html>

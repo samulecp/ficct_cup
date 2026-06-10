@@ -33,6 +33,11 @@ public function store(LoginRequest $request): RedirectResponse
     $request->authenticate();
 
     $request->session()->regenerate();
+    LogService::registrar(
+    'LOGIN',
+    'USUARIOS',
+    'Inicio de sesión: ' . Auth::user()->name
+);
 
     return redirect()->route('dashboard');
 }

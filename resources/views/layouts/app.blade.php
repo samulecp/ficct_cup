@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <head>
     <style>
 [x-cloak] {
@@ -82,9 +82,12 @@
 
             <div class="flex items-center gap-4">
 
-                <span>
-                    {{ auth()->user()->name }}
-                </span>
+               <a href="{{ route('profile.edit') }}"
+           class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            @if(auth()->check())
+    {{ auth()->user()->name }}
+@endif
+        </a>
 
                 <form method="POST"
                       action="{{ route('logout') }}">

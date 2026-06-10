@@ -11,12 +11,19 @@ use Illuminate\Support\Facades\Hash;
 
 class OperadorController extends Controller
 {
-    public function index()
-    {
-        $operadores = Operador::with('user')->get();
+    public function index(Request $request)
+{
+    $buscar = $request->buscar;
 
-        return view('admin.operadores.index', compact('operadores'));
-    }
+    $operadores = Operador::when($buscar, function ($query) use ($buscar) {
+
+        $query->where('nombre', 'ILIKE', "%{$buscar}%")
+              ->orWhere('ci', 'ILIKE', "%{$buscar}%");
+
+    })->get();
+
+    return view('admin.operadores.index', compact('operadores'));
+}
 
     public function create()
     {

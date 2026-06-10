@@ -20,8 +20,7 @@ return new class extends Migration
         ->onDelete('cascade');
 
     $table->string('ci')->unique();
-    $table->string('nombre');
-    $table->string('correo')->unique();
+    
     $table->string('telefono', 20)->nullable();
 
     $table->timestamps();

@@ -28,72 +28,272 @@
 
 </a>
 
-<a href="{{ route('postulante.index') }}"
-   class="flex items-center p-2 rounded hover:bg-gray-700
-   {{ request()->routeIs('postulante.*') ? 'bg-gray-700' : '' }}">
+<div x-data="{ openSeguridad: false }">
 
-    <span class="text-lg">👥</span>
+    <button
+        @click="openSeguridad = !openSeguridad"
+        class="w-full flex items-center justify-between px-4 py-2 rounded hover:bg-gray-700">
+
+        <span class="flex items-center gap-2">
+
+            🔒
+
+            <span x-show="sidebarOpen">
+                Seguridad
+            </span>
+
+        </span>
+
+        <svg
+            :class="{ 'rotate-90': openSeguridad }"
+            class="w-4 h-4 transition-transform duration-200"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24">
+
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"/>
+
+        </svg>
+
+    </button>
+
+    <div x-show="sidebarOpen && openSeguridad"
+         x-transition
+         class="ml-4 mt-2 space-y-1">
+
+        <a href="{{ route('admin.usuarios.index') }}"
+           class="block px-4 py-2 rounded hover:bg-gray-700">
+            Usuarios
+        </a>
+
+        <a href="{{ route('admin.administradores.index') }}"
+           class="block px-4 py-2 rounded hover:bg-gray-700">
+            Administradores
+        </a>
+
+        <a href="{{ route('admin.operadores.index') }}"
+           class="block px-4 py-2 rounded hover:bg-gray-700">
+            Operadores
+        </a>
+
+        
+        <a href="{{ route('postulante.index') }}"
+           class="block px-4 py-2 rounded hover:bg-gray-700">
+            Postulantes
+        </a>
+
+        <a href="{{ route('admin.docentes.index') }}"
+           class="block px-4 py-2 rounded hover:bg-gray-700">
+            Docentes
+        </a>
+
+    </div>
+
+</div>
+
+<div x-data="{ openLogistica: false }">
+
+    <button
+        @click="openLogistica = !openLogistica"
+        class="w-full flex items-center justify-between px-3 py-2 rounded hover:bg-gray-800 transition">
+
+        <span class="flex items-center gap-2">
+
+            🔧
+
+            <span x-show="sidebarOpen">
+                Logística
+            </span>
+
+        </span>
+
+        <svg x-show="sidebarOpen"
+             :class="openLogistica ? 'rotate-90' : ''"
+             class="w-4 h-4 transition-transform"
+             fill="none"
+             stroke="currentColor"
+             viewBox="0 0 24 24">
+
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"/>
+
+        </svg>
+
+    </button>
+
+    <div x-show="sidebarOpen && openLogistica"
+         x-transition
+         class="ml-6 mt-2 space-y-1">
+
+        <a href="{{ route('admin.periodos.index') }}"
+           class="block px-3 py-2 rounded hover:bg-gray-800">
+            Periodos
+        </a>
+
+        <a href="{{ route('horarios.index') }}"
+           class="block px-3 py-2 rounded hover:bg-gray-800">
+            Horarios
+        </a>
+
+        <a href="{{ route('admin.aulas.index') }}"
+           class="block px-3 py-2 rounded hover:bg-gray-800">
+            Aulas
+        </a>
+
+        <a href="{{ route('admin.materias.index') }}"
+           class="block px-3 py-2 rounded hover:bg-gray-800">
+            Materias
+        </a>
+
+        <a href="{{ route('admin.carreras.index') }}"
+           class="block px-3 py-2 rounded hover:bg-gray-800">
+            Carreras
+        </a>
+
+    </div>
+
+</div>
+
+<div x-data="{ openPreinscripcion: false }">
+
+    <button
+        @click="openPreinscripcion = !openPreinscripcion"
+        class="w-full flex items-center justify-between px-3 py-2 rounded hover:bg-gray-800 transition">
+
+        <span class="flex items-center gap-2">
+
+            📝
+
+            <span x-show="sidebarOpen">
+                Preinscripción
+            </span>
+
+        </span>
+
+        <svg x-show="sidebarOpen"
+             :class="openPreinscripcion ? 'rotate-90' : ''"
+             class="w-4 h-4 transition-transform"
+             fill="none"
+             stroke="currentColor"
+             viewBox="0 0 24 24">
+
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"/>
+
+        </svg>
+
+    </button>
+
+    <div x-show="sidebarOpen && openPreinscripcion"
+         x-transition
+         class="ml-6 mt-2 space-y-1">
+
+        <a href="{{ route('preinscripciones.index') }}"
+           class="block px-3 py-2 rounded hover:bg-gray-800">
+
+            Preinscripciones
+
+        </a>
+
+        <a href="{{ route('grupos.index') }}"
+           class="block px-3 py-2 rounded hover:bg-gray-800">
+
+            Grupos
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<a href="{{ route('clases.index') }}"
+   class="flex items-center p-2 rounded hover:bg-gray-700">
+
+    <span>🏛</span>
 
     <span x-show="sidebarOpen"
           x-transition
+          x-cloak
           class="ml-3">
-        Postulantes
+
+        Clase
+
     </span>
 
 </a>
 
-<a href="{{ route('admin.carreras.index') }}"
-   class="flex items-center p-2 rounded hover:bg-gray-700
-   {{ request()->routeIs('admin.carreras.*') ? 'bg-gray-700' : '' }}">
+<a href="{{ route('calificaciones.index') }}"
+   class="flex items-center p-2 rounded hover:bg-gray-700">
 
-    <span class="text-lg">🎓</span>
+    <span>💯</span>
 
     <span x-show="sidebarOpen"
           x-transition
+          x-cloak
           class="ml-3">
-        Carreras
+
+        Calificaciones
+
+
     </span>
 
 </a>
 
-<a href="{{ route('admin.operadores.index') }}"
-   class="flex items-center p-2 rounded hover:bg-gray-700
-   {{ request()->routeIs('admin.operadores.*') ? 'bg-gray-700' : '' }}">
+<a href="{{ route('admin.resultados.index') }}"
+   class="flex items-center p-2 rounded hover:bg-gray-700">
 
-    <span class="text-lg">💻</span>
+    <span>📌</span>
 
     <span x-show="sidebarOpen"
           x-transition
+          x-cloak
           class="ml-3">
-        Operadores
+
+        Resultados
+
+
     </span>
 
 </a>
 
-<a href="{{ route('admin.periodos.index') }}"
-   class="flex items-center p-2 rounded hover:bg-gray-700
-   {{ request()->routeIs('admin.periodos.*') ? 'bg-gray-700' : '' }}">
+<a href="{{ route('reportes.index') }}"
+   class="flex items-center p-2 rounded hover:bg-gray-700">
 
-    <span class="text-lg">📅</span>
+    <span>📊</span>
 
     <span x-show="sidebarOpen"
           x-transition
+          x-cloak
           class="ml-3">
-        Periodos
+
+        Reportes
+
+
     </span>
 
 </a>
 
-<a href="{{ route('preinscripciones.index') }}"
-   class="flex items-center p-2 rounded hover:bg-gray-700
-   {{ request()->routeIs('preinscripciones.*') ? 'bg-gray-700' : '' }}">
+<a href="{{ route('postulaciones.index') }}"
+   class="flex items-center p-2 rounded hover:bg-gray-700">
 
-    <span class="text-lg">📝</span>
+    <span>📁</span>
 
     <span x-show="sidebarOpen"
           x-transition
+          x-cloak
           class="ml-3">
-        Pre Inscripciones
+
+        Postulaciones
+
+
     </span>
 
 </a>

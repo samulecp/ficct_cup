@@ -4,20 +4,35 @@
 
 @section('content')
 
-<div class="flex justify-between mb-6">
-    <h1 class="text-2xl font-bold">Operadores</h1>
+<div class="flex justify-between items-center mb-4">
 
     <a href="{{ route('admin.operadores.create') }}"
-       class="bg-blue-600 text-white px-4 py-2 rounded">
+       class="bg-green-600 text-white px-4 py-2 rounded">
         Nuevo Operador
     </a>
-</div>
 
-@if(session('success'))
-    <div class="bg-green-100 text-green-700 p-3 rounded mb-4">
-        {{ session('success') }}
-    </div>
-@endif
+    <form method="GET"
+          action="{{ route('admin.operadores.index') }}"
+          class="flex gap-2">
+
+        <input type="text"
+               name="buscar"
+               value="{{ request('buscar') }}"
+               placeholder="Buscar operador..."
+               class="border rounded px-3 py-2">
+
+        <button class="bg-blue-600 text-white px-4 py-2 rounded">
+            Buscar
+        </button>
+
+        <a href="{{ route('admin.operadores.index') }}"
+           class="bg-gray-500 text-white px-4 py-2 rounded">
+            Limpiar
+        </a>
+
+    </form>
+
+</div>
 
 <div class="bg-white rounded shadow overflow-x-auto">
     <table class="w-full">

@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('administradores', function (Blueprint $table) {
+
     $table->id();
 
     $table->foreignId('user_id')
@@ -19,13 +20,13 @@ return new class extends Migration
         ->onDelete('cascade');
 
     $table->string('ci')->unique();
-    $table->string('nombre');
-    $table->string('correo')->unique();
+
     $table->string('telefono', 20)->nullable();
 
     $table->boolean('estado')->default(true);
 
     $table->timestamps();
+
 });
     }
 

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Administrador;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -11,13 +12,11 @@ class AdminSeeder extends Seeder
 {
     public function run(): void
     {
-        // Crear roles si no existen
         Role::firstOrCreate(['name' => 'administrador']);
         Role::firstOrCreate(['name' => 'operador']);
         Role::firstOrCreate(['name' => 'docente']);
         Role::firstOrCreate(['name' => 'postulante']);
 
-        // Crear admin
         $user = User::firstOrCreate(
             ['email' => 'admin@prueba.com'],
             [
@@ -27,5 +26,14 @@ class AdminSeeder extends Seeder
         );
 
         $user->syncRoles(['administrador']);
+
+        Administrador::firstOrCreate(
+    ['user_id' => $user->id],
+    [
+        'ci' => '12345678',
+        'telefono' => '70000000',
+        'estado' => true,
+    ]
+);
     }
 }

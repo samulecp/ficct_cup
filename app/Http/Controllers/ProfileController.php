@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Services\LogService;
 
 class ProfileController extends Controller
 {
@@ -33,7 +34,11 @@ class ProfileController extends Controller
         }
 
         $request->user()->save();
-
+        LogService::registrar(
+            'EDITAR',
+            'USUARIOS',
+            'Se actualizó usuario: ' . $request->user()->name
+        );
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
@@ -54,7 +59,11 @@ class ProfileController extends Controller
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
+        LogService::registrar(
+            'ELIMINAR',
+            'USUARIOS',
+            'Se eliminó usuario: ' . $user->name
+        );
         return Redirect::to('/');
     }
 }

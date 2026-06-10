@@ -21,7 +21,7 @@ return new class extends Migration
 
     $table->string('nombre');
 
-    $table->integer('cupo');
+  
 
     $table->timestamps();
 });

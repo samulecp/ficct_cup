@@ -39,7 +39,7 @@
 
 </a>
 
-<a href="{{ route('reportes.index') }}"
+<a href="{{ route('reportes.academico') }}"
    class="flex items-center p-2 rounded hover:bg-gray-700
    {{ request()->routeIs('reportes.*') ? 'bg-gray-700' : '' }}">
 

@@ -1,86 +1,98 @@
 @extends('layouts.app')
 
-@section('title','Mis Clases')
+@section('title','Mi Horario')
 
 @section('content')
 
-<h2 class="text-xl font-bold mb-4">
-
-
-Mis Clases
-
-
+<h2 class="text-2xl font-bold mb-6">
+    Mi Horario de Clases
 </h2>
 
-<div class="bg-white rounded shadow overflow-x-auto">
+@php
 
-<table class="w-full">
+$dias = [
+    'LUNES',
+    'MARTES',
+    'MIERCOLES',
+    'JUEVES',
+    'VIERNES',
+    'SABADO'
+];
 
+@endphp
 
-<thead class="bg-gray-100">
+<div class="bg-white rounded-lg shadow overflow-x-auto">
 
-    <tr>
+<table class="w-full border-collapse">
 
-        <th class="p-3">
-            Materia
-        </th>
+    <thead>
 
-        <th class="p-3">
-            Docente
-        </th>
+        <tr class="bg-blue-600 text-white">
 
-        <th class="p-3">
-            Aula
-        </th>
+            <th class="p-4 border">
+                Hora
+            </th>
 
-        <th class="p-3">
-            Horario
-        </th>
+            @foreach($dias as $dia)
 
-    </tr>
+                <th class="p-4 border">
+                    {{ $dia }}
+                </th>
 
-</thead>
+            @endforeach
 
-<tbody>
+        </tr>
 
-@foreach($clases as $clase)
+    </thead>
 
-    <tr class="border-t">
+    <tbody>
 
-        <td class="p-3">
+        @foreach($horarioGrid as $hora => $fila)
 
-            {{ $clase->materia->nombre }}
+        <tr>
 
-        </td>
+            <td class="border p-4 font-semibold bg-gray-50">
 
-        <td class="p-3">
+                {{ $hora }}
 
-            {{ $clase->docente->user->name }}
+            </td>
 
-        </td>
+            @foreach($dias as $dia)
 
-        <td class="p-3">
+                <td class="border p-3 text-center align-middle h-24">
 
-            {{ $clase->aula->nombre }}
+                    @if(isset($fila[$dia]))
 
-        </td>
+                        <div class="font-bold text-blue-700">
 
-        <td class="p-3">
+                            {{ $fila[$dia]->materia->nombre }}
 
-            {{ $clase->horario->dia }}
-            -
-            {{ $clase->horario->hora_inicio }}
-            a
-            {{ $clase->horario->hora_fin }}
+                        </div>
 
-        </td>
+                        <div class="text-sm text-gray-600">
 
-    </tr>
+                            Aula:
+                            {{ $fila[$dia]->aula->nombre }}
 
-@endforeach
+                        </div>
 
-</tbody>
+                        <div class="text-xs text-gray-500">
 
+                            {{ $fila[$dia]->docente->user->name }}
+
+                        </div>
+
+                    @endif
+
+                </td>
+
+            @endforeach
+
+        </tr>
+
+        @endforeach
+
+    </tbody>
 
 </table>
 

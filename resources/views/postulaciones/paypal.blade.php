@@ -23,7 +23,7 @@
         </p>
 
         <p class="text-4xl font-bold text-green-600 mb-6">
-            Bs. 500
+            Bs. 700
         </p>
 
         <form

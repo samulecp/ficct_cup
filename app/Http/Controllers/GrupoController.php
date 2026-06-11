@@ -6,20 +6,31 @@ use App\Models\Grupo;
 use App\Models\Periodo;
 use Illuminate\Http\Request;
 use App\Services\LogService;
-use App\Models\Clase;
-use App\Models\Calificacion;
+
 use App\Models\PreInscripcion;
 
 class GrupoController extends Controller
 {
     public function index()
-    {
-        $grupos = Grupo::with('periodo')
-            ->latest()
-            ->paginate(10);
+{
+    $periodoActivo = Periodo::where(
+        'activo',
+        true
+    )->first();
 
-        return view('grupos.index', compact('grupos'));
-    }
+    $grupos = Grupo::with('periodo')
+    ->withCount('preinscripciones')
+    ->orderBy('nombre')
+    ->paginate(10);
+
+    return view(
+        'grupos.index',
+        compact(
+            'grupos',
+            'periodoActivo'
+        )
+    );
+}
 
     public function create()
     {
@@ -96,51 +107,7 @@ class GrupoController extends Controller
 
 
 
-    public function generar()
-{
-    $preinscripciones = PreInscripcion::whereNotNull(
-        'grupo_id'
-    )->get();
-
-    foreach ($preinscripciones as $pre) {
-
-        $clases = Clase::where(
-            'grupo_id',
-            $pre->grupo_id
-        )->get();
-
-        foreach ($clases as $clase) {
-
-            Calificacion::firstOrCreate(
-
-                [
-                    'pre_inscripcion_id' => $pre->id,
-                    'clase_id' => $clase->id,
-                ],
-
-                [
-                    'examen1' => 0,
-                    'examen2' => 0,
-                    'examen3' => 0,
-                    'nota_final' => 0,
-                ]
-            );
-        }
-    }
-
-    LogService::registrar(
-        'GENERAR',
-        'CALIFICACIONES',
-        'Se generaron calificaciones automáticamente'
-    );
-
-    return redirect()
-        ->route('calificaciones.index')
-        ->with(
-            'success',
-            'Calificaciones generadas correctamente.'
-        );
-}
+    
 
 public function asignarAutomaticamente()
 {
@@ -232,4 +199,90 @@ public function asignarAutomaticamente()
         'Postulantes asignados correctamente.'
     );
 }
+
+public function generar()
+{
+    
+
+
+    $periodo = Periodo::where(
+        'activo',
+        true
+    )->first();
+    
+    if (!$periodo) {
+
+        return back()->with(
+            'error',
+            'No existe un periodo activo.'
+        );
+    }
+
+    $cantidadPreinscripciones =
+        PreInscripcion::where(
+            'periodo_id',
+            $periodo->id
+        )->count();
+
+    if ($cantidadPreinscripciones == 0) {
+
+        return back()->with(
+            'error',
+            'No existen preinscripciones.'
+        );
+    }
+
+    if (
+        Grupo::where(
+            'periodo_id',
+            $periodo->id
+        )->exists()
+    ) {
+
+        return back()->with(
+            'error',
+            'Ya existen grupos para el periodo activo.'
+        );
+    }
+
+    $cantidadGrupos = ceil(
+        $cantidadPreinscripciones /
+        $periodo->max_alumno_grupo
+    );
+
+    $turnos = ['M', 'T', 'N'];
+
+    $contador = [
+        'M' => 1,
+        'T' => 1,
+        'N' => 1,
+    ];
+
+    for ($i = 0; $i < $cantidadGrupos; $i++) {
+
+        $turno = $turnos[$i % 3];
+
+        $nombre =
+            $turno .
+            str_pad(
+                $contador[$turno],
+                2,
+                '0',
+                STR_PAD_LEFT
+            );
+
+        Grupo::create([
+            'periodo_id' => $periodo->id,
+            'nombre' => $nombre,
+        ]);
+
+        $contador[$turno]++;
+    }
+
+    return back()->with(
+        'success',
+        "{$cantidadGrupos} grupos generados correctamente."
+    );
+}
+
 }

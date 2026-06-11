@@ -11,7 +11,7 @@
     </h1>
 
     <form method="POST"
-          action="{{ route('postulante.update', $postulante) }}">
+      action="{{ route('admin-postulantes.update', $postulante->id) }}">
 
         @csrf
         @method('PUT')

@@ -4,21 +4,40 @@
 
 @section('content')
 
+<div class="mb-6">
+    <h1 class="text-2xl font-bold">
+        Mis Clases
+    </h1>
+
+    <p class="text-gray-500">
+        Horario semanal del docente
+    </p>
+</div>
+
+@php
+    $dias = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+@endphp
+
 <div class="bg-white rounded shadow overflow-x-auto">
 
-<table class="w-full">
+<table class="w-full border-collapse">
 
+    {{-- ENCABEZADO --}}
     <thead class="bg-gray-100">
 
         <tr>
 
-            <th class="p-3">Grupo</th>
+            {{-- columna izquierda (horarios) --}}
+            <th class="p-3 text-left w-40">
+                Horario
+            </th>
 
-            <th class="p-3">Materia</th>
-
-            <th class="p-3">Aula</th>
-
-            <th class="p-3">Horario</th>
+            {{-- días arriba --}}
+            @foreach($dias as $dia)
+                <th class="p-3 text-center">
+                    {{ $dia }}
+                </th>
+            @endforeach
 
         </tr>
 
@@ -26,46 +45,64 @@
 
     <tbody>
 
-    @foreach($clases as $clase)
+        {{-- agrupamos por horario --}}
+        @php
+            $horarios = $clases->groupBy(function($c){
+                return $c->horario->hora_inicio . ' - ' . $c->horario->hora_fin;
+            });
+        @endphp
+
+        @foreach($horarios as $rango => $clasesPorHora)
 
         <tr class="border-t">
 
-            <td class="p-3">
-
-                {{ $clase->grupo->nombre }}
-
+            {{-- HORARIO IZQUIERDA --}}
+            <td class="p-3 font-semibold bg-gray-50">
+                {{ $rango }}
             </td>
 
-            <td class="p-3">
+            {{-- CELDAS POR DÍA --}}
+            @foreach($dias as $dia)
 
-                {{ $clase->materia->nombre }}
+                <td class="p-2 align-top">
 
-            </td>
+                    @php
+                        $clasesDia = $clasesPorHora->filter(function($c) use ($dia) {
+                            return $c->horario->dia == $dia;
+                        });
+                    @endphp
 
-            <td class="p-3">
+                    @foreach($clasesDia as $clase)
 
-                {{ $clase->aula->nombre }}
+                        <div class="bg-blue-100 rounded p-2 mb-2 text-sm">
 
-            </td>
+                            <div class="font-bold">
+                                {{ $clase->materia->nombre }}
+                            </div>
 
-            <td class="p-3">
+                            <div class="text-gray-700">
+                                Grupo: {{ $clase->grupo->nombre }}
+                            </div>
 
-                {{ $clase->horario->dia }}
-                -
-                {{ $clase->horario->hora_inicio }}
-                a
-                {{ $clase->horario->hora_fin }}
+                            <div class="text-gray-600">
+                                Aula: {{ $clase->aula->nombre }}
+                            </div>
 
-            </td>
+                        </div>
+
+                    @endforeach
+
+                </td>
+
+            @endforeach
 
         </tr>
 
-    @endforeach
+        @endforeach
 
     </tbody>
 
 </table>
-
 
 </div>
 

@@ -12,9 +12,9 @@
 
 </a>
 
-<a href="{{ route('postulante.index') }}"
+<a href="{{ route('admin-postulantes.index') }}"
    class="flex items-center p-2 rounded hover:bg-gray-700
-   {{ request()->routeIs('postulante.*') ? 'bg-gray-700' : '' }}">
+   {{ request()->routeIs('admin-postulantes.*') ? 'bg-gray-700' : '' }}">
 
     <span class="text-lg">👥</span>
 
@@ -39,9 +39,9 @@
 
 </a>
 
-<a href="{{ route('dashboard') }}"
+<a href="{{ route('reportes.index') }}"
    class="flex items-center p-2 rounded hover:bg-gray-700
-   {{ request()->routeIs('dashboard') ? 'bg-gray-700' : '' }}">
+   {{ request()->routeIs('reportes.*') ? 'bg-gray-700' : '' }}">
 
     <span class="text-lg">📊</span>
 

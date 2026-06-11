@@ -21,4 +21,11 @@ class Grupo extends Model
     return $this->hasMany(Clase::class);
 }
 
+public function preinscripciones()
+{
+    return $this->hasMany(
+        PreInscripcion::class
+    );
+}
+
 }

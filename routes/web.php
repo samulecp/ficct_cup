@@ -1,7 +1,7 @@
 <?php
 
 
-use App\Http\Controllers\SolicitudAdminController;
+
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdministradorController;
 use App\Http\Controllers\AulaController;
@@ -21,8 +21,11 @@ use App\Http\Controllers\PreInscripcionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\ResultadoAcademicoController;
+use App\Http\Controllers\DashboardController;
 
 use Illuminate\Support\Facades\Route;
+
+
 
 Route::get(
     '/',
@@ -58,6 +61,11 @@ Route::get('/dashboard', function () {
 
 
 
+
+
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->name('dashboard');
+
 Route::resource(
     'calificaciones',
     CalificacionController::class
@@ -78,7 +86,12 @@ Route::middleware(['auth', 'role:administrador|operador'])
             'create',
             'store'
         ]);
-        Route::resource('postulante', PostulanteController::class);
+      Route::resource(
+    'admin-postulantes',
+    PostulanteController::class
+)->parameters([
+    'admin-postulantes' => 'postulante'
+]);
         Route::resource('grupos', GrupoController::class);
         Route::resource('clases', ClaseController::class);
         Route::resource('horarios', HorarioController::class);
@@ -90,10 +103,20 @@ Route::middleware(['auth', 'role:administrador|operador'])
 )->name(
     'grupos.asignarAutomaticamente'
 );
-Route::get('/reportes', [ReporteController::class, 'index'])
-    ->name('reportes.index');   
+Route::post(
+    '/grupos/generar',
+    [GrupoController::class, 'generar']
+)->name('grupos.generar');
+
+
+Route::get('/reportes/academico', [ReporteController::class, 'academico'])
+    ->name('reportes.academico');
+
 Route::get('/reportes/pdf', [ReporteController::class, 'pdf'])
     ->name('reportes.pdf');
+
+Route::get('/reportes/csv', [ReporteController::class, 'csv'])
+    ->name('reportes.csv');
 
 Route::post(
     '/calificaciones/generar',
@@ -118,7 +141,11 @@ Route::post('/postulaciones/{postulacion}/estado', [PostulacionController::class
 Route::middleware(['auth', 'role:operador'])
     ->prefix('operador')
     ->name('operador.')
-    ->group(function () {});
+    ->group(function () {
+
+
+
+    });
 
 // DOCENTE
 Route::middleware(['auth', 'role:docente'])
@@ -149,7 +176,7 @@ Route::middleware(['auth', 'role:docente'])
     });
 
 // POSTULANTE
-Route::middleware(['auth', 'role:postulante'])
+Route::middleware(['auth'])
     ->prefix('postulante')
     ->name('postulante.')
     ->group(function () {
@@ -163,6 +190,16 @@ Route::middleware(['auth', 'role:postulante'])
             '/mis-calificaciones',
             [PostulanteController::class,'misCalificaciones']
         )->name('misCalificaciones');
+
+        Route::get(
+    '/mis-docentes',
+    [PostulanteController::class,'misDocentes']
+)->name('misDocentes');
+
+Route::get(
+    '/resultado-academico',
+    [PostulanteController::class,'resultadoAcademico']
+)->name('resultadoAcademico');
 
     });
 

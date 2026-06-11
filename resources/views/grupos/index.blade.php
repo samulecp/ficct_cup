@@ -17,19 +17,37 @@
 
 </div>
 
-<form method="POST"
-      action="{{ route('grupos.asignarAutomaticamente') }}">
+<div class="flex gap-2 mb-4">
 
-    @csrf
+    <form method="POST"
+          action="{{ route('grupos.generar') }}">
 
-    <button
-        class="bg-indigo-600 text-white px-4 py-2 rounded">
+        @csrf
 
-        Asignar Automáticamente
+        <button
+            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
 
-    </button>
+            Generar Grupos
 
-</form>
+        </button>
+
+    </form>
+
+    <form method="POST"
+          action="{{ route('grupos.asignarAutomaticamente') }}">
+
+        @csrf
+
+        <button
+            class="bg-indigo-600 text-white px-4 py-2 rounded">
+
+            Asignar Automáticamente
+
+        </button>
+
+    </form>
+
+</div>
 
 <div class="bg-white rounded shadow overflow-x-auto">
 
@@ -39,10 +57,25 @@
 
             <tr>
 
-                <th class="p-3 text-left">ID</th>
-                <th class="p-3 text-left">Grupo</th>
-                <th class="p-3 text-left">Periodo</th>
-                <th class="p-3 text-left">Acciones</th>
+                <th class="p-3 text-left">
+                    ID
+                </th>
+
+                <th class="p-3 text-left">
+                    Grupo
+                </th>
+
+                <th class="p-3 text-left">
+                    Periodo
+                </th>
+
+                <th class="p-3 text-left">
+                    Alumnos
+                </th>
+
+                <th class="p-3 text-left">
+                    Acciones
+                </th>
 
             </tr>
 
@@ -58,12 +91,22 @@
                     {{ $grupo->id }}
                 </td>
 
-                <td class="p-3">
+                <td class="p-3 font-semibold">
                     {{ $grupo->nombre }}
                 </td>
 
                 <td class="p-3">
                     {{ $grupo->periodo->nombre }}
+                </td>
+
+                <td class="p-3">
+
+                    {{ $grupo->preinscripciones_count }}
+
+                    /
+
+                    {{ $grupo->periodo->max_alumno_grupo }}
+
                 </td>
 
                 <td class="p-3 flex gap-2">
@@ -79,7 +122,8 @@
                         @csrf
                         @method('DELETE')
 
-                        <button class="bg-red-600 text-white px-3 py-1 rounded">
+                        <button
+                            class="bg-red-600 text-white px-3 py-1 rounded">
                             Eliminar
                         </button>
 
@@ -93,7 +137,7 @@
 
             <tr>
 
-                <td colspan="4"
+                <td colspan="5"
                     class="p-4 text-center">
 
                     No existen grupos registrados

@@ -9,7 +9,7 @@
     
 
     <form method="GET"
-          action="{{ route('postulante.index') }}"
+          action="{{ route('admin-postulantes.index') }}"
           class="flex gap-2">
 
         <input type="text"
@@ -22,7 +22,7 @@
             Buscar
         </button>
 
-        <a href="{{ route('postulante.index') }}"
+        <a href="{{ route('admin-postulantes.index') }}"
            class="bg-gray-500 text-white px-4 py-2 rounded">
             Limpiar
         </a>
@@ -64,7 +64,7 @@
 
                     <td class="p-3 flex gap-2">
 
-                        <a href="{{ route('postulante.edit', $postulante) }}"
+                        <a href="{{ route('admin-postulantes.edit', $postulante) }}"
                            class="bg-yellow-500 text-white px-3 py-1 rounded">
 
                             Editar
@@ -72,7 +72,7 @@
                         </a>
 
                         <form method="POST"
-                              action="{{ route('postulante.destroy', $postulante) }}"
+                              action="{{ route('admin-postulantes.destroy', $postulante) }}"
                               onsubmit="return confirm('¿Está seguro de eliminar este postulante?')">
 
                             @csrf

@@ -80,7 +80,7 @@
         </a>
 
         
-        <a href="{{ route('postulante.index') }}"
+        <a href="{{ route('admin-postulantes.index') }}"
            class="block px-4 py-2 rounded hover:bg-gray-700">
             Postulantes
         </a>
@@ -264,7 +264,7 @@
 
 </a>
 
-<a href="{{ route('reportes.index') }}"
+<a href="{{ route('reportes.academico') }}"
    class="flex items-center p-2 rounded hover:bg-gray-700">
 
     <span>📊</span>

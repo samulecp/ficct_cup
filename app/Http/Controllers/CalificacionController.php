@@ -356,49 +356,26 @@ return redirect()
 {
     $docente = Auth::user()->docente;
 
-    $periodoActivo = Periodo::where(
-        'activo',
-        true
-    )->first();
+    $periodoActivo = Periodo::where('activo', true)->first();
 
     if (!$periodoActivo) {
-
-        return back()->with(
-            'error',
-            'No existe un período activo.'
-        );
+        return back()->with('error', 'No existe un período activo.');
     }
 
-    $clases = Clase::with([
-        'grupo',
-        'materia'
-    ])
-
-    ->where(
-        'docente_id',
-        $docente->id
-    )
-
-    ->whereHas(
-        'grupo',
-        function ($q) use ($periodoActivo) {
-
-            $q->where(
-                'periodo_id',
-                $periodoActivo->id
-            );
-
-        }
-    )
-
-    ->get();
+    $clases = Clase::with(['grupo', 'materia'])
+        ->where('docente_id', $docente->id)
+        ->whereHas('grupo', function ($q) use ($periodoActivo) {
+            $q->where('periodo_id', $periodoActivo->id);
+        })
+        ->get()
+        ->unique(function ($c) {
+            return $c->grupo_id . '-' . $c->materia_id;
+        })
+        ->values();
 
     return view(
         'docente.calificaciones',
-        compact(
-            'clases',
-            'periodoActivo'
-        )
+        compact('clases', 'periodoActivo')
     );
 }
     
@@ -407,17 +384,10 @@ return redirect()
 {
     $docente = Auth::user()->docente;
 
-    $periodoActivo = Periodo::where(
-        'activo',
-        true
-    )->first();
+    $periodoActivo = Periodo::where('activo', true)->first();
 
     if (!$periodoActivo) {
-
-        return back()->with(
-            'error',
-            'No existe un periodo activo.'
-        );
+        return back()->with('error', 'No existe un periodo activo.');
     }
 
     $clases = Clase::with([
@@ -426,38 +396,29 @@ return redirect()
         'aula',
         'horario'
     ])
+    ->where('docente_id', $docente->id)
+    ->whereHas('grupo', function ($q) use ($periodoActivo) {
+        $q->where('periodo_id', $periodoActivo->id);
+    })
 
-    ->where(
-        'docente_id',
-        $docente->id
-    )
+    // 🔥 ORDEN REAL EN BASE DE DATOS
+    ->join('horarios', 'clases.horario_id', '=', 'horarios.id')
+    ->orderByRaw("CASE horarios.dia
+        WHEN 'Lunes' THEN 1
+        WHEN 'Martes' THEN 2
+        WHEN 'Miércoles' THEN 3
+        WHEN 'Jueves' THEN 4
+        WHEN 'Viernes' THEN 5
+        WHEN 'Sábado' THEN 6
+        ELSE 99
+    END")
+    ->orderBy('horarios.hora_inicio')
 
-    ->whereHas(
-        'grupo',
-        function ($q) use ($periodoActivo) {
-
-            $q->where(
-                'periodo_id',
-                $periodoActivo->id
-            );
-
-        }
-    )
-
-    ->orderBy('grupo_id')
-
+    ->select('clases.*')
     ->get();
 
-    return view(
-        'docente.mis-clases',
-        compact(
-            'clases',
-            'periodoActivo'
-        )
-    );
+    return view('docente.mis-clases', compact('clases', 'periodoActivo'));
 }
-
-
 public function calificarClase(
     Clase $clase
 )

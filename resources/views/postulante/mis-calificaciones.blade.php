@@ -26,15 +26,18 @@ Mis Calificaciones
         </th>
 
         <th class="p-3">
-            Examen 1
+            Examen 1 
+            (30)
         </th>
 
         <th class="p-3">
-            Examen 2
+            Examen 2 
+            (30)
         </th>
 
         <th class="p-3">
-            Examen 3
+            Examen 3 
+            (40)
         </th>
 
         <th class="p-3">

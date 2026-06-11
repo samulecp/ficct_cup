@@ -3,106 +3,121 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Calificacion;
-use App\Models\Docente;
-use App\Models\Grupo;
+
 use App\Models\Periodo;
-use App\Models\Materia;
+
+use App\Models\PreInscripcion;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReporteController extends Controller
 {
-    public function index(Request $request)
-    {
-        $periodo = Periodo::where('activo', true)->first();
+    public function academico(Request $request)
+{
+    $periodos = Periodo::all();
 
-        // ======================
-        // QUERY BASE
-        // ======================
-        $query = Calificacion::with([
-            'preinscripcion',
-            'clase.docente.user',
-            'clase.grupo',
-            'clase.materia',
-            'preinscripcion.periodo'
-        ]);
+    $distribucion = $this->getDistribucion($request);
 
-        // ======================
-        // FILTROS (IMPORTANTE: AQUÍ TODO ANTES DEL GET)
-        // ======================
+    return view('reportes.academico', compact(
+        'periodos',
+        'distribucion'
+    ));
+}
 
-        if ($request->periodo_id) {
-            $query->whereHas('preinscripcion', fn($q) =>
-                $q->where('periodo_id', $request->periodo_id)
-            );
-        }
 
-        if ($request->docente_id) {
-            $query->whereHas('clase', fn($q) =>
-                $q->where('docente_id', $request->docente_id)
-            );
-        }
+private function getDistribucion(Request $request)
+{
+    $query = PreInscripcion::with([
+        'resultadoAcademico',
+        'grupo.clases.materia',
+        'grupo.clases.docente.user',
+        'carreraPrimera'
+    ]);
 
-        if ($request->grupo_id) {
-            $query->whereHas('clase', fn($q) =>
-                $q->where('grupo_id', $request->grupo_id)
-            );
-        }
-
-        if ($request->materia_id) {
-            $query->whereHas('clase', fn($q) =>
-                $q->where('materia_id', $request->materia_id)
-            );
-        }
-
-        if ($request->nota_min) {
-            $query->where('nota_final', '>=', $request->nota_min);
-        }
-
-        if ($request->nota_max) {
-            $query->where('nota_final', '<=', $request->nota_max);
-        }
-
-        $calificaciones = $query->get();
-
-        // ======================
-        // KPIs BASE
-        // ======================
-        $total = $calificaciones->count();
-
-        $notaAprobacion = $periodo?->nota_aprobacion ?? 51;
-
-        $aprobados = $calificaciones->where('nota_final', '>=', $notaAprobacion)->count();
-        $reprobados = $calificaciones->where('nota_final', '<', $notaAprobacion)->count();
-
-        $porAprobados = $total ? round($aprobados * 100 / $total, 2) : 0;
-        $porReprobados = $total ? round($reprobados * 100 / $total, 2) : 0;
-
-        // ======================
-        // DROPDOWNS (NUNCA VACÍOS)
-        // ======================
-        return view('reportes.index', [
-            'total' => $total,
-            'aprobados' => $aprobados,
-            'reprobados' => $reprobados,
-            'porAprobados' => $porAprobados,
-            'porReprobados' => $porReprobados,
-
-            'docentes' => Docente::with('user')->get(),
-            'grupos' => Grupo::all(),
-            'periodos' => Periodo::all(),
-            'materias' => Materia::all(),
-
-            'request' => $request
-        ]);
+    if ($request->periodo_id) {
+        $query->where('periodo_id', $request->periodo_id);
     }
 
-    public function pdf(Request $request)
-    {
-        $data = $this->index($request)->getData();
+    $data = $query->get();
 
-        $pdf = Pdf::loadView('reportes.pdf', $data);
-
-        return $pdf->stream('reporte.pdf'); // o download()
+    if ($request->estado == 'APROBADO') {
+        $data = $data->filter(fn($p) =>
+            optional($p->resultadoAcademico)->estado === 'APROBADO'
+        );
     }
+
+    if ($request->estado == 'REPROBADO') {
+        $data = $data->filter(fn($p) =>
+            optional($p->resultadoAcademico)->estado === 'REPROBADO'
+        );
+    }
+
+    $total = max($data->count(), 1);
+
+    switch ($request->tipo) {
+
+        case 'carreras':
+            $grouped = $data->groupBy(fn($p) =>
+                optional($p->carreraPrimera)->nombre ?? 'Sin carrera'
+            );
+            break;
+
+        case 'grupos':
+            $grouped = $data->groupBy(fn($p) =>
+                optional($p->grupo)->nombre ?? 'Sin grupo'
+            );
+            break;
+
+        case 'materias':
+            $grouped = $data->flatMap(fn($p) =>
+                $p->grupo->clases->map(fn($c) => $c->materia->nombre ?? 'Sin materia')
+            )->groupBy(fn($x) => $x);
+            break;
+
+        case 'docentes':
+            $grouped = $data->flatMap(fn($p) =>
+                $p->grupo->clases->map(fn($c) => $c->docente->user->name ?? 'Sin docente')
+            )->groupBy(fn($x) => $x);
+            break;
+
+        default:
+            $grouped = collect(['Total' => $data]);
+    }
+
+    return [
+        'labels' => $grouped->keys()->values(),
+        'values' => $grouped->map(fn($g) =>
+            round($g->count() / $total * 100, 2)
+        )->values()
+    ];
+}
+
+
+
+public function pdf(Request $request)
+{
+    $periodos = Periodo::all();
+
+    $distribucion = $this->getDistribucion($request);
+
+    return \Barryvdh\DomPDF\Facade\Pdf::loadView('reportes.pdf', [
+        'periodos' => $periodos,
+        'distribucion' => $distribucion,
+        'request' => $request->all()
+    ])->stream('reporte.pdf');
+}
+
+public function csv(Request $request)
+{
+    $data = $this->getDistribucion($request);
+
+    $csv = "Categoria,Porcentaje\n";
+
+    foreach ($data['labels'] as $i => $label) {
+        $csv .= "{$label},{$data['values'][$i]}\n";
+    }
+
+    return response($csv)
+        ->header('Content-Type', 'text/csv')
+        ->header('Content-Disposition', 'attachment; filename=reporte.csv');
+}
 }

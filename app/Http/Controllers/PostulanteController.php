@@ -60,7 +60,7 @@ class PostulanteController extends Controller
         );
 
         return redirect()
-            ->route('postulante.index')
+            ->route('admin-postulantes.index')
             ->with('success', 'Postulante actualizado');
     }
 
@@ -77,7 +77,7 @@ class PostulanteController extends Controller
         );
 
         return redirect()
-            ->route('postulante.index')
+            ->route('admin-postulantes.index')
             ->with('success', 'Postulante eliminado');
     }
 
@@ -126,20 +126,34 @@ class PostulanteController extends Controller
         'aula',
         'horario'
     ])
-
     ->where(
         'grupo_id',
         $preinscripcion->grupo_id
     )
-
-    ->orderBy('materia_id')
-
     ->get();
+
+    $horarioGrid = [];
+
+    foreach ($clases as $clase) {
+
+        $hora =
+            $clase->horario->hora_inicio .
+            ' - ' .
+            $clase->horario->hora_fin;
+
+        $dia = strtoupper(
+            $clase->horario->dia
+        );
+
+        $horarioGrid[$hora][$dia] = $clase;
+    }
+
+    ksort($horarioGrid);
 
     return view(
         'postulante.mis-clases',
         compact(
-            'clases',
+            'horarioGrid',
             'periodoActivo'
         )
     );
@@ -199,4 +213,50 @@ public function misCalificaciones()
         )
     );
 }
+
+public function misDocentes()
+{
+    $postulante = Auth::user()->postulante;
+
+    $preinscripcion = PreInscripcion::where(
+        'postulante_id',
+        $postulante->id
+    )->first();
+
+    $docentes = Clase::with([
+        'docente.user',
+        'materia'
+    ])
+    ->where(
+        'grupo_id',
+        $preinscripcion->grupo_id
+    )
+    ->get()
+    ->unique('docente_id');
+
+    return view(
+        'postulante.mis-docentes',
+        compact('docentes')
+    );
+}
+
+public function resultadoAcademico()
+{
+    $postulante = Auth::user()->postulante;
+
+    $preinscripcion = PreInscripcion::where(
+        'postulante_id',
+        $postulante->id
+    )->first();
+
+    $resultado =
+        $preinscripcion->resultadoAcademico;
+
+    return view(
+        'postulante.resultado-academico',
+        compact('resultado')
+    );
+}
+
+
 }
